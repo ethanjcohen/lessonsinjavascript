@@ -12,6 +12,8 @@ System.out.println(xmlResponse);
 <h3>The problem with asynchronous code in javaScript</h3>
 If we implement our code this way in JavaScript, the browser will be hung while we are waiting for data to be returned from the web service.
 
+Why? Because JavaScript executes on a single thread!
+
 Take this example in JavaScript:
 
 ```javascript
