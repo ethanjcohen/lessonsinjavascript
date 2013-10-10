@@ -45,75 +45,12 @@
 <h2>
 <a name="lesson-1-callback-basics" class="anchor" href="#lesson-1-callback-basics"><span class="octicon octicon-link"></span></a>Lesson 1: Callback Basics</h2>
 
-<p>A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:</p>
-
-<div class="highlight highlight-java"><pre><span class="n">String</span> <span class="n">xmlResponse</span> <span class="o">=</span> <span class="n">getDataFromWebService</span><span class="o">();</span>
-<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">xmlResponse</span><span class="o">);</span>
-</pre></div>
-
 <h3>
-<a name="the-problem-with-asynchronous-code-in-javascript" class="anchor" href="#the-problem-with-asynchronous-code-in-javascript"><span class="octicon octicon-link"></span></a>The problem with asynchronous code in javaScript</h3>
-
-<p>If we implement our code this way in JavaScript, the browser will be hung while we are waiting for data to be returned from the web service.</p>
-
-<p>Why? Because JavaScript executes on a single thread!</p>
-
-<p>Take this example in JavaScript:</p>
-
-<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">xmlData</span> <span class="o">=</span> <span class="nx">getDataFromWebService</span><span class="p">();</span>
-<span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
-</pre></div>
-
-<p>We want to show "Loading..." on the screen, and then replace that with the response from the web service. </p>
-
-<p><b>But JavaScript runs in a SINGLE thread!</b></p>
-
-<p>That means that the browser uses only one thread to both execute JavaScript and render content on the screen - "Loading..." will not be rendered on the screen until the JavaScript has finished executing. If the web service takes 2 minutes to return, the user will be stuck looking at a blank screen for 2 minutes!</p>
-
-<h3>
-<a name="the-right-way-use-callbacks" class="anchor" href="#the-right-way-use-callbacks"><span class="octicon octicon-link"></span></a>The right way: use callbacks</h3>
+<a name="whats-a-callback" class="anchor" href="#whats-a-callback"><span class="octicon octicon-link"></span></a>What's a callback?</h3>
 
 <p>A callback is nothing more than a function that you pass to another function as an argument or parameter.</p>
 
-<p>Take a look at the above example re-written using a callback design pattern:</p>
-
-<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
-<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">)</span> <span class="c1">//create an anonymous function to pass in as a parameter</span>
-<span class="p">{</span>
-    <span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
-
-<p>In the above example, we assume that the function <b>getDataFromWebService</b> takes one parameter, a function. When <b>getDataFromWebService</b> has retrieved the web service data, it will execute the function, passing the xml data to it.</p>
-
-<p>The above example was implemented using an anonymous function (a function that has no name), which you'll often see in JavaScript code.</p>
-
-<p>Another way to write this example:</p>
-
-<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
-<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="nx">updateView</span><span class="p">);</span> <span class="c1">//pass in the callback function as a parameter</span>
-</pre></div>
-
-<h3>
-<a name="one-more-time" class="anchor" href="#one-more-time"><span class="octicon octicon-link"></span></a>One more time!</h3>
-
-<p>Let's look at another example of using a callback.</p>
+<p>Let's look at a very simple example of using a callback design pattern.</p>
 
 <p>The following function takes two numbers as parameters and returns the sum:</p>
 
@@ -143,7 +80,85 @@
 <span class="p">});</span>
 </pre></div>
 
-<p>See the difference? The two pieces of code above do exactly the same thing, but one uses a callback. Using a callback for this example is obviously not needed, but that's not the point.</p>
+<p>See the difference? The two pieces of code above do exactly the same thing, but the second uses a callback. Using a callback for this example is obviously not needed, but that's not the point.</p>
+
+<h3>
+<a name="the-problem-with-synchronous-linear-code-in-javascript" class="anchor" href="#the-problem-with-synchronous-linear-code-in-javascript"><span class="octicon octicon-link"></span></a>The problem with synchronous (linear) code in javaScript</h3>
+
+<p>A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:</p>
+
+<div class="highlight highlight-java"><pre><span class="n">String</span> <span class="n">xmlResponse</span> <span class="o">=</span> <span class="n">getDataFromWebService</span><span class="o">();</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">xmlResponse</span><span class="o">);</span>
+</pre></div>
+
+<p>If we implement our code this way in JavaScript, the browser will be hung while we are waiting for data to be returned from the web service.</p>
+
+<p>Why? Because the browser will not update the screen (the DOM elements) while JavaScript is running.</p>
+
+<p>Think about that: nothing will update on the UI until your JavaScript has finished executing!</p>
+
+<p>Take this example in JavaScript:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">xmlData</span> <span class="o">=</span> <span class="nx">getDataFromWebService</span><span class="p">();</span>
+<span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
+</pre></div>
+
+<p>We want to show "Loading..." on the screen, and then replace that with the response from the web service. </p>
+
+<p>Unfortunately, "Loading..." will not be rendered on the screen until the JavaScript has finished executing. If the web service takes 2 minutes to return, the user will be stuck looking at a blank screen for 2 minutes!</p>
+
+<p>Here's what actually happens:</p>
+
+<ol>
+<li>updateView is called</li>
+    <li>The browser adds an event to it's queue to update the UI</li>
+    <li>getDataFromWebService is called</li>
+    <li>A request is sent to the web service</li>
+    <li>The web service returns a response</li>
+    <li>The value of xmlData is set to the xml response</li>
+    <li>updateView is called</li>
+    <li>The browser adds an event to it's queue to update the UI</li>
+    <li>The browser updates the view with "Loading..."</li>
+    <li>The browser updates the view with the value of xmlData</li>
+</ol><p>The user will see a white screen for 2 minutes, then the xml. The user will never see "Loading..."</p>
+
+<h3>
+<a name="the-right-way-use-callbacks" class="anchor" href="#the-right-way-use-callbacks"><span class="octicon octicon-link"></span></a>The right way: use callbacks</h3>
+
+<p>Take a look at the above example re-written using a callback design pattern:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">)</span> <span class="c1">//create an anonymous function to pass in as a parameter</span>
+<span class="p">{</span>
+    <span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In the above example, we assume that the function <b>getDataFromWebService</b> takes one parameter, a function. When <b>getDataFromWebService</b> has retrieved the web service data, it will execute the function, passing the xml data to it.</p>
+
+<p>The above example was implemented using an anonymous function (a function that has no name), which you'll often see in JavaScript code.</p>
+
+<p>Another way to write this example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="nx">updateView</span><span class="p">);</span> <span class="c1">//pass in the callback function as a parameter</span>
+</pre></div>
 
 <h3>
 <a name="callbacks-are-are-great-for-event-driven-design" class="anchor" href="#callbacks-are-are-great-for-event-driven-design"><span class="octicon octicon-link"></span></a>Callbacks are are great for event-driven design</h3>
