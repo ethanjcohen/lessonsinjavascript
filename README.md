@@ -1,7 +1,7 @@
 Lessons In JavaScript
 ===================
 
-<h2>Lesson 1: Callbacks</h2>
+<h2>Lesson 1: Callback Basics</h2>
 
 A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:
 ```java
