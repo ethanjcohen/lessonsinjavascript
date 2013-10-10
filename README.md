@@ -3,16 +3,54 @@ Lessons In JavaScript
 
 <h2>Lesson 1: Callback Basics</h2>
 
+<h3>What's a callback?</h3>
+A callback is nothing more than a function that you pass to another function as an argument or parameter.
+
+Let's look at a very simple example of using a callback design pattern.
+
+The following function takes two numbers as parameters and returns the sum:
+```javascript
+function sum(numberOne, numberTwo)
+{
+	var value = numberOne + numberTwo;
+	return value;
+}
+
+var value = sum(2, 5); //value is 7
+```
+
+You can rewrite that function using the callback design pattern:
+```javascript
+function sum(numberOne, numberTwo, callbackFunction)
+{
+	var value = numberOne + numberTwo;
+	callbackFunction(value);
+}
+
+var value = null;
+
+sum(2, 5, function(result)
+{
+	//result is 7
+	value = result;
+});
+```
+
+See the difference? The two pieces of code above do exactly the same thing, but the second uses a callback. Using a callback for this example is obviously not needed, but that's not the point.
+
+
+<h3>The problem with synchronous (linear) code in javaScript</h3>
 A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:
 ```java
 String xmlResponse = getDataFromWebService();
 System.out.println(xmlResponse);
 ```
 
-<h3>The problem with asynchronous code in javaScript</h3>
 If we implement our code this way in JavaScript, the browser will be hung while we are waiting for data to be returned from the web service.
 
-Why? Because JavaScript executes on a single thread!
+Why? Because the browser will not update the screen (the DOM elements) while JavaScript is running.
+
+Think about that: nothing will update on the UI until your JavaScript has finished executing!
 
 Take this example in JavaScript:
 
@@ -29,13 +67,25 @@ updateView(xmlData);
 
 We want to show "Loading..." on the screen, and then replace that with the response from the web service. 
 
-<b>But JavaScript runs in a SINGLE thread!</b>
+Unfortunately, "Loading..." will not be rendered on the screen until the JavaScript has finished executing. If the web service takes 2 minutes to return, the user will be stuck looking at a blank screen for 2 minutes!
 
-That means that the browser uses only one thread to both execute JavaScript and render content on the screen - "Loading..." will not be rendered on the screen until the JavaScript has finished executing. If the web service takes 2 minutes to return, the user will be stuck looking at a blank screen for 2 minutes!
+Here's what actually happens:
+<ol>
+	<li>updateView is called</li>
+	<li>The browser adds an event to it's queue to update the UI</li>
+	<li>getDataFromWebService is called</li>
+	<li>A request is sent to the web service</li>
+	<li>The web service returns a response</li>
+	<li>The value of xmlData is set to the xml response</li>
+	<li>updateView is called</li>
+	<li>The browser adds an event to it's queue to update the UI</li>
+	<li>The browser updates the view with "Loading..."</li>
+	<li>The browser updates the view with the value of xmlData</li>
+</ol>
+
+The user will see a white screen for 2 minutes, then the xml. The user will never see "Loading..."
 
 <h3>The right way: use callbacks</h3>
-
-A callback is nothing more than a function that you pass to another function as an argument or parameter.
 
 Take a look at the above example re-written using a callback design pattern:
 
@@ -67,39 +117,6 @@ function updateView(text)
 updateView('Loading...');
 getDataFromWebService(updateView); //pass in the callback function as a parameter
 ```
-
-<h3>One more time!</h3>
-Let's look at another example of using a callback.
-
-The following function takes two numbers as parameters and returns the sum:
-```javascript
-function sum(numberOne, numberTwo)
-{
-	var value = numberOne + numberTwo;
-	return value;
-}
-
-var value = sum(2, 5); //value is 7
-```
-
-You can rewrite that function using the callback design pattern:
-```javascript
-function sum(numberOne, numberTwo, callbackFunction)
-{
-	var value = numberOne + numberTwo;
-	callbackFunction(value);
-}
-
-var value = null;
-
-sum(2, 5, function(result)
-{
-	//result is 7
-	value = result;
-});
-```
-
-See the difference? The two pieces of code above do exactly the same thing, but one uses a callback. Using a callback for this example is obviously not needed, but that's not the point.
 
 <h3>Callbacks are are great for event-driven design</h3>
 
