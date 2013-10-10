@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Lessons In JavaScript by ethanjcohen</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Lessons In JavaScript</h1>
+        <p>This contains lessons discussing some of the complicated concepts in JavaScript, in an effort to transition Java developers to JavaScript.</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/ethanjcohen/lessonsinjavascript" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/ethanjcohen/lessonsinjavascript/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/ethanjcohen/lessonsinjavascript/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>
+<a name="lessons-in-javascript" class="anchor" href="#lessons-in-javascript"><span class="octicon octicon-link"></span></a>Lessons In JavaScript</h1>
+
+<h2>
+<a name="lesson-1-callback-basics" class="anchor" href="#lesson-1-callback-basics"><span class="octicon octicon-link"></span></a>Lesson 1: Callback Basics</h2>
+
+<p>A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:</p>
+
+<div class="highlight highlight-java"><pre><span class="n">String</span> <span class="n">xmlResponse</span> <span class="o">=</span> <span class="n">getDataFromWebService</span><span class="o">();</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">xmlResponse</span><span class="o">);</span>
+</pre></div>
+
+<h3>
+<a name="the-problem-with-asynchronous-code-in-javascript" class="anchor" href="#the-problem-with-asynchronous-code-in-javascript"><span class="octicon octicon-link"></span></a>The problem with asynchronous code in javaScript</h3>
+
+<p>If we implement our code this way in JavaScript, the browser will be hung while we are waiting for data to be returned from the web service.</p>
+
+<p>Why? Because JavaScript executes on a single thread!</p>
+
+<p>Take this example in JavaScript:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">xmlData</span> <span class="o">=</span> <span class="nx">getDataFromWebService</span><span class="p">();</span>
+<span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
+</pre></div>
+
+<p>We want to show "Loading..." on the screen, and then replace that with the response from the web service. </p>
+
+<p><b>But JavaScript runs in a SINGLE thread!</b></p>
+
+<p>That means that the browser uses only one thread to both execute JavaScript and render content on the screen - "Loading..." will not be rendered on the screen until the JavaScript has finished executing. If the web service takes 2 minutes to return, the user will be stuck looking at a blank screen for 2 minutes!</p>
+
+<h3>
+<a name="the-right-way-use-callbacks" class="anchor" href="#the-right-way-use-callbacks"><span class="octicon octicon-link"></span></a>The right way: use callbacks</h3>
+
+<p>A callback is nothing more than a function that you pass to another function as an argument or parameter.</p>
+
+<p>Take a look at the above example re-written using a callback design pattern:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">)</span> <span class="c1">//create an anonymous function to pass in as a parameter</span>
+<span class="p">{</span>
+    <span class="nx">updateView</span><span class="p">(</span><span class="nx">xmlData</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In the above example, we assume that the function <b>getDataFromWebService</b> takes one parameter, a function. When <b>getDataFromWebService</b> has retrieved the web service data, it will execute the function, passing the xml data to it.</p>
+
+<p>The above example was implemented using an anonymous function (a function that has no name), which you'll often see in JavaScript code.</p>
+
+<p>Another way to write this example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">updateView</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'#output'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">updateView</span><span class="p">(</span><span class="s1">'Loading...'</span><span class="p">);</span>
+<span class="nx">getDataFromWebService</span><span class="p">(</span><span class="nx">updateView</span><span class="p">);</span> <span class="c1">//pass in the callback function as a parameter</span>
+</pre></div>
+
+<h3>
+<a name="one-more-time" class="anchor" href="#one-more-time"><span class="octicon octicon-link"></span></a>One more time!</h3>
+
+<p>Let's look at another example of using a callback.</p>
+
+<p>The following function takes two numbers as parameters and returns the sum:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">numberOne</span><span class="p">,</span> <span class="nx">numberTwo</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">numberOne</span> <span class="o">+</span> <span class="nx">numberTwo</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span> <span class="c1">//value is 7</span>
+</pre></div>
+
+<p>You can rewrite that function using the callback design pattern:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">sum</span><span class="p">(</span><span class="nx">numberOne</span><span class="p">,</span> <span class="nx">numberTwo</span><span class="p">,</span> <span class="nx">callbackFunction</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">numberOne</span> <span class="o">+</span> <span class="nx">numberTwo</span><span class="p">;</span>
+    <span class="nx">callbackFunction</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+<span class="nx">sum</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">//result is 7</span>
+    <span class="nx">value</span> <span class="o">=</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>See the difference? The two pieces of code above do exactly the same thing, but one uses a callback. Using a callback for this example is obviously not needed, but that's not the point.</p>
+
+<h3>
+<a name="callbacks-are-are-great-for-event-driven-design" class="anchor" href="#callbacks-are-are-great-for-event-driven-design"><span class="octicon octicon-link"></span></a>Callbacks are are great for event-driven design</h3>
+
+<p>jQuery uses a lot of callbacks to connect a function with an event. Take this simple example:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">$</span><span class="p">(</span><span class="s1">'button'</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">'click'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"The button was clicked!"</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/ethanjcohen">ethanjcohen</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
