@@ -40,13 +40,10 @@
       </nav>
       <section>
         <h1>
-<a name="lessons-in-javascript" class="anchor" href="#lessons-in-javascript"><span class="octicon octicon-link"></span></a>Lessons In JavaScript</h1>
+<a name="lesson-1-callback-basics" class="anchor" href="#lesson-1-callback-basics"><span class="octicon octicon-link"></span></a>Lesson 1: Callback Basics</h1>
 
 <h2>
-<a name="lesson-1-callback-basics" class="anchor" href="#lesson-1-callback-basics"><span class="octicon octicon-link"></span></a>Lesson 1: Callback Basics</h2>
-
-<h3>
-<a name="whats-a-callback" class="anchor" href="#whats-a-callback"><span class="octicon octicon-link"></span></a>What's a callback?</h3>
+<a name="whats-a-callback" class="anchor" href="#whats-a-callback"><span class="octicon octicon-link"></span></a>What's a callback?</h2>
 
 <p>A callback is nothing more than a function that you pass to another function as an argument or parameter.</p>
 
@@ -82,8 +79,8 @@
 
 <p>See the difference? The two pieces of code above do exactly the same thing, but the second uses a callback. Using a callback for this example is obviously not needed, but that's not the point.</p>
 
-<h3>
-<a name="the-problem-with-synchronous-linear-code-in-javascript" class="anchor" href="#the-problem-with-synchronous-linear-code-in-javascript"><span class="octicon octicon-link"></span></a>The problem with synchronous (linear) code in javaScript</h3>
+<h2>
+<a name="the-problem-with-synchronous-linear-code-in-javascript" class="anchor" href="#the-problem-with-synchronous-linear-code-in-javascript"><span class="octicon octicon-link"></span></a>The problem with synchronous (linear) code in javaScript</h2>
 
 <p>A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:</p>
 
@@ -128,8 +125,8 @@
     <li>The browser updates the view with the value of xmlData</li>
 </ol><p>The user will see a white screen for 2 minutes, then the xml. The user will never see "Loading..."</p>
 
-<h3>
-<a name="the-right-way-use-callbacks" class="anchor" href="#the-right-way-use-callbacks"><span class="octicon octicon-link"></span></a>The right way: use callbacks</h3>
+<h2>
+<a name="the-right-way-use-callbacks" class="anchor" href="#the-right-way-use-callbacks"><span class="octicon octicon-link"></span></a>The right way: use callbacks</h2>
 
 <p>Take a look at the above example re-written using a callback design pattern:</p>
 
@@ -160,8 +157,8 @@
 <span class="nx">getDataFromWebService</span><span class="p">(</span><span class="nx">updateView</span><span class="p">);</span> <span class="c1">//pass in the callback function as a parameter</span>
 </pre></div>
 
-<h3>
-<a name="callbacks-are-are-great-for-event-driven-design" class="anchor" href="#callbacks-are-are-great-for-event-driven-design"><span class="octicon octicon-link"></span></a>Callbacks are are great for event-driven design</h3>
+<h2>
+<a name="callbacks-are-are-great-for-event-driven-design" class="anchor" href="#callbacks-are-are-great-for-event-driven-design"><span class="octicon octicon-link"></span></a>Callbacks are are great for event-driven design</h2>
 
 <p>jQuery uses a lot of callbacks to connect a function with an event. Take this simple example:</p>
 
@@ -173,11 +170,11 @@
 
 <p>In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.</p>
 
-<h2>
-<a name="lesson-2-async-program-flow" class="anchor" href="#lesson-2-async-program-flow"><span class="octicon octicon-link"></span></a>Lesson 2: Async Program Flow</h2>
+<h1>
+<a name="lesson-2-async-program-flow" class="anchor" href="#lesson-2-async-program-flow"><span class="octicon octicon-link"></span></a>Lesson 2: Async Program Flow</h1>
 
-<h3>
-<a name="linear-operations-with-nested-callbacks" class="anchor" href="#linear-operations-with-nested-callbacks"><span class="octicon octicon-link"></span></a>Linear Operations with Nested Callbacks</h3>
+<h2>
+<a name="linear-operations-with-nested-callbacks" class="anchor" href="#linear-operations-with-nested-callbacks"><span class="octicon octicon-link"></span></a>Linear Operations with Nested Callbacks</h2>
 
 <p>Again, let's take a simplified Java server-side code block that calls multiple web services from some API.</p>
 
@@ -222,8 +219,8 @@ The function <b>getActiveUser</b> is executed first. When that function returns 
 <span class="p">});</span>
 </pre></div>
 
-<h3>
-<a name="async-functions-in-for-loops" class="anchor" href="#async-functions-in-for-loops"><span class="octicon octicon-link"></span></a>Async Functions in For Loops</h3>
+<h2>
+<a name="async-functions-in-for-loops" class="anchor" href="#async-functions-in-for-loops"><span class="octicon octicon-link"></span></a>Async Functions in For Loops</h2>
 
 <p>Let's say we need to make multiple calls to a web service, and then do something afterwards. Assume for this example that we have two user IDs and a function <b>sendMessage</b> that sends a message to a single user.</p>
 
@@ -304,6 +301,50 @@ The function <b>getActiveUser</b> is executed first. When that function returns 
         <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent messages"</span><span class="p">);</span>
     <span class="p">}</span>
 <span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="a-more-complicated-example" class="anchor" href="#a-more-complicated-example"><span class="octicon octicon-link"></span></a>A more complicated example</h2>
+
+<p>Building slightly on the previous example, let's say we want to call another async function afterwards to create a log.</p>
+
+<p>To keep things organized, we can wrap the previous example in it's own function, which accepts the userIDs array and a callback:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">function</span> <span class="nx">sendMessages</span><span class="p">(</span><span class="nx">userIDs</span><span class="p">,</span> <span class="nx">sentMessagesCallback</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">messagesToSend</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">userID</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+        <span class="nx">sendMessage</span><span class="p">(</span><span class="nx">userID_B</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="nx">sentMessage</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">sentMessage</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent one message"</span><span class="p">);</span>
+
+        <span class="nx">messagesToSend</span><span class="o">--</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">messagesToSend</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="c1">//all web service responses have been received!</span>
+            <span class="nx">sentMessagesCallback</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>And then treat this like any other asynchronous function, like so:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">userIDs</span> <span class="o">=</span> <span class="p">[...];</span> <span class="c1">//an array of X user IDs</span>
+
+<span class="nx">sendMessages</span><span class="p">(</span><span class="nx">userIDs</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nx">createLog</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"all messages have been sent and a log has been created!"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
 </pre></div>
       </section>
       <footer>
