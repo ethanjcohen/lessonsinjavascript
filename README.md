@@ -257,3 +257,45 @@ function sentMessage()
 	}
 }
 ```
+
+<h3>A more complicated example</h3>
+Building slightly on the previous example, let's say we want to call another async function afterwards to create a log.
+
+To keep things organized, we can wrap the previous example in it's own function, which accepts the userIDs array and a callback:
+```javascript
+function sendMessages(userIDs, sentMessagesCallback)
+{
+	var messagesToSend = userIDs.length;
+
+	for(var i=0; i<userIDs.length; i++)
+	{
+		var userID = userIDs[i];
+		sendMessage(userID_B, "Hello", sentMessage);
+	}
+
+	function sentMessage()
+	{
+		console.log("sent one message");
+		
+		messagesToSend--;
+		if(messagesToSend == 0)
+		{
+			//all web service responses have been received!
+			sentMessagesCallback();
+		}
+	}
+}
+```
+
+And then treat this like any other asynchronous function, like so:
+```javascript
+var userIDs = [...]; //an array of X user IDs
+
+sendMessages(userIDs, function()
+{
+	createLog(function()
+	{
+		console.log("all messages have been sent and a log has been created!");
+	});
+});
+```
