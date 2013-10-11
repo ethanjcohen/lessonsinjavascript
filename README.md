@@ -1,9 +1,6 @@
-Lessons In JavaScript
-===================
+<h1>Lesson 1: Callback Basics</h1>
 
-<h2>Lesson 1: Callback Basics</h2>
-
-<h3>What's a callback?</h3>
+<h2>What's a callback?</h2>
 A callback is nothing more than a function that you pass to another function as an argument or parameter.
 
 Let's look at a very simple example of using a callback design pattern.
@@ -39,7 +36,7 @@ sum(2, 5, function(result)
 See the difference? The two pieces of code above do exactly the same thing, but the second uses a callback. Using a callback for this example is obviously not needed, but that's not the point.
 
 
-<h3>The problem with synchronous (linear) code in javaScript</h3>
+<h2>The problem with synchronous (linear) code in javaScript</h2>
 A lot of Java developers have trouble grasping the asyncronous nature of JavaScript. In Java server-side code, to retrieve data from a web service you might do something like this:
 ```java
 String xmlResponse = getDataFromWebService();
@@ -85,7 +82,7 @@ Here's what actually happens:
 
 The user will see a white screen for 2 minutes, then the xml. The user will never see "Loading..."
 
-<h3>The right way: use callbacks</h3>
+<h2>The right way: use callbacks</h2>
 
 Take a look at the above example re-written using a callback design pattern:
 
@@ -118,7 +115,7 @@ updateView('Loading...');
 getDataFromWebService(updateView); //pass in the callback function as a parameter
 ```
 
-<h3>Callbacks are are great for event-driven design</h3>
+<h2>Callbacks are are great for event-driven design</h2>
 
 jQuery uses a lot of callbacks to connect a function with an event. Take this simple example:
 ```javascript
@@ -129,9 +126,9 @@ $('button').on('click', function()
 ```
 In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.
 
-<h2>Lesson 2: Async Program Flow</h2>
+<h1>Lesson 2: Async Program Flow</h1>
 
-<h3>Linear Operations with Nested Callbacks</h3>
+<h2>Linear Operations with Nested Callbacks</h2>
 Again, let's take a simplified Java server-side code block that calls multiple web services from some API.
 ```java
 Integer userID = getActiveUser();
@@ -175,7 +172,7 @@ getActiveUser(function(userID)
 });
 ```
 
-<h3>Async Functions in For Loops</h3>
+<h2>Async Functions in For Loops</h2>
 Let's say we need to make multiple calls to a web service, and then do something afterwards. Assume for this example that we have two user IDs and a function <b>sendMessage</b> that sends a message to a single user.
 
 To send a message to those users, we could write our JavaScript like this:
@@ -258,7 +255,7 @@ function sentMessage()
 }
 ```
 
-<h3>A more complicated example</h3>
+<h2>A more complicated example</h2>
 Building slightly on the previous example, let's say we want to call another async function afterwards to create a log.
 
 To keep things organized, we can wrap the previous example in it's own function, which accepts the userIDs array and a callback:
