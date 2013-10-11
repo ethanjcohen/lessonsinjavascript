@@ -1,4 +1,4 @@
-<h1>Lesson 1: Callback Basics</h1>
+<h1>Callback Basics</h1>
 
 <h2>What's a callback?</h2>
 A callback is nothing more than a function that you pass to another function as an argument or parameter.
@@ -126,7 +126,7 @@ $('button').on('click', function()
 ```
 In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.
 
-<h1>Lesson 2: Async Program Flow</h1>
+<h1>Async Program Flow</h1>
 
 <h2>Linear Operations with Nested Callbacks</h2>
 Again, let's take a simplified Java server-side code block that calls multiple web services from some API.
