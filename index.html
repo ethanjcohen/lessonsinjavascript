@@ -172,6 +172,139 @@
 </pre></div>
 
 <p>In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.</p>
+
+<h2>
+<a name="lesson-2-async-program-flow" class="anchor" href="#lesson-2-async-program-flow"><span class="octicon octicon-link"></span></a>Lesson 2: Async Program Flow</h2>
+
+<h3>
+<a name="linear-operations-with-nested-callbacks" class="anchor" href="#linear-operations-with-nested-callbacks"><span class="octicon octicon-link"></span></a>Linear Operations with Nested Callbacks</h3>
+
+<p>Again, let's take a simplified Java server-side code block that calls multiple web services from some API.</p>
+
+<div class="highlight highlight-java"><pre><span class="n">Integer</span> <span class="n">userID</span> <span class="o">=</span> <span class="n">getActiveUser</span><span class="o">();</span>
+<span class="n">Array</span> <span class="n">friendsArray</span> <span class="o">=</span> <span class="n">getFriendsOfUser</span><span class="o">(</span><span class="n">userID</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"The user has "</span> <span class="o">+</span> <span class="n">friendsArray</span><span class="o">.</span><span class="na">length</span> <span class="o">+</span> <span class="s">" friends."</span><span class="o">);</span>
+</pre></div>
+
+<p>This is how that example would look with callbacks in JavaScript:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">getActiveUser</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">userID</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">getFriendsOfUser</span><span class="p">(</span><span class="nx">userID</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">friendsArray</span><span class="p">){</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"The user has "</span> <span class="o">+</span> <span class="nx">friendsArray</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="s2">" friends."</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>In both examples above:
+The function <b>getActiveUser</b> is executed first. When that function returns the user's ID, the function <b>getFriendsOfUser</b> is executed. Then when that function returns the array of friends, the number of friends is displayed.</p>
+
+<p>Let's make it slightly more complicated by adding one more function...</p>
+
+<p>In Java:</p>
+
+<div class="highlight highlight-java"><pre><span class="n">Integer</span> <span class="n">userID</span> <span class="o">=</span> <span class="n">getActiveUser</span><span class="o">();</span>
+<span class="n">Array</span> <span class="n">friendsArray</span> <span class="o">=</span> <span class="n">getFriendsOfUser</span><span class="o">(</span><span class="n">userID</span><span class="o">);</span>
+<span class="n">Boolean</span> <span class="n">sent</span> <span class="o">=</span> <span class="n">sendMessageToUsers</span><span class="o">(</span><span class="n">userID</span><span class="o">,</span> <span class="n">friendsArray</span><span class="o">,</span> <span class="s">"Hello"</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"The messages were sent: "</span> <span class="o">+</span> <span class="n">sent</span><span class="o">);</span>
+</pre></div>
+
+<p>In JavaScript:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">getActiveUser</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">userID</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">getFriendsOfUser</span><span class="p">(</span><span class="nx">userID</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">friendsArray</span><span class="p">){</span>
+        <span class="nx">sendMessageToUsers</span><span class="p">(</span><span class="nx">userID</span><span class="p">,</span> <span class="nx">friendsArray</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">sent</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"The messages were sent: "</span> <span class="o">+</span> <span class="nx">sent</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="async-functions-in-for-loops" class="anchor" href="#async-functions-in-for-loops"><span class="octicon octicon-link"></span></a>Async Functions in For Loops</h3>
+
+<p>Let's say we need to make multiple calls to a web service, and then do something afterwards. Assume for this example that we have two user IDs and a function <b>sendMessage</b> that sends a message to a single user.</p>
+
+<p>To send a message to those users, we could write our JavaScript like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">sendMessage</span><span class="p">(</span><span class="nx">userID_A</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nx">sendMessage</span><span class="p">(</span><span class="nx">userID_B</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent messages"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>This is a very clean way to structure our code. It will send "Hello" to userA first, then send a message "Hello" to userB and finally show "sent messages."</p>
+
+<p>But what if you had to send messages to 5 users? or 10? or 100? Should we still use nested callbacks like this? No - that would be impossible to read.</p>
+
+<p>I see a lot of developers try to write something like this:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">userIDs</span> <span class="o">=</span> <span class="p">[....];</span> <span class="c1">//an array of X length</span>
+
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">userID</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="nx">sendMessage</span><span class="p">(</span><span class="nx">userID_B</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent one message"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent messages"</span><span class="p">);</span>
+</pre></div>
+
+<p>Here's what will happen at runtime:</p>
+
+<ol>
+<li>X requests will be made to the <b>sendMessage</b> web service</li>
+<li>The console will log "sent messages"</li>
+<li>X responses will return (at some time), followed by the log "sent one message"</li>
+</ol><p>Notice what's happening here: the final log is executing after the requests to the web service have been made, NOT after the responses have returned. We want all X responses to return and then to log "sent messages." Here's how:</p>
+
+<p>A simple solution to this is creating one more function and a counter equal to the number of asyncronous calls:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">messagesToSend</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nx">sentMessage</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nx">messagesToSend</span><span class="o">--</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">messagesToSend</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//all web service responses have been received!</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent messages"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This function will be called every time <b>sendMessage</b> executes it's callback. It will only execute the final log, after it has been called X times.</p>
+
+<p>Here's the correct way to structure this code:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">userIDs</span> <span class="o">=</span> <span class="p">[....];</span> <span class="c1">//an array of unknown or large size</span>
+<span class="kd">var</span> <span class="nx">messagesToSend</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">userIDs</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">userID</span> <span class="o">=</span> <span class="nx">userIDs</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="nx">sendMessage</span><span class="p">(</span><span class="nx">userID_B</span><span class="p">,</span> <span class="s2">"Hello"</span><span class="p">,</span> <span class="nx">sentMessage</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">sentMessage</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent one message"</span><span class="p">);</span>
+
+    <span class="nx">messagesToSend</span><span class="o">--</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">messagesToSend</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">//all web service responses have been received!</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"sent messages"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/ethanjcohen">ethanjcohen</a></p>
