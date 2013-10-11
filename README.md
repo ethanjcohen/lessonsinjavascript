@@ -128,3 +128,132 @@ $('button').on('click', function()
 });
 ```
 In the above example, every time the user clicks a button on the web page, a message will be shown. The first parameter to the <b>on</b> function is a string, the event name, and the second parameter is a callback function to execute when that event occurs.
+
+<h2>Lesson 2: Async Program Flow</h2>
+
+<h3>Linear Operations with Nested Callbacks</h3>
+Again, let's take a simplified Java server-side code block that calls multiple web services from some API.
+```java
+Integer userID = getActiveUser();
+Array friendsArray = getFriendsOfUser(userID);
+System.out.println("The user has " + friendsArray.length + " friends.");
+```
+
+This is how that example would look with callbacks in JavaScript:
+```javascript
+getActiveUser(function(userID)
+{
+	getFriendsOfUser(userID, function(friendsArray){
+		console.log("The user has " + friendsArray.length + " friends.");
+	});
+});
+```
+
+In both examples above:
+The function <b>getActiveUser</b> is executed first. When that function returns the user's ID, the function <b>getFriendsOfUser</b> is executed. Then when that function returns the array of friends, the number of friends is displayed.
+
+Let's make it slightly more complicated by adding one more function...
+
+In Java:
+```java
+Integer userID = getActiveUser();
+Array friendsArray = getFriendsOfUser(userID);
+Boolean sent = sendMessageToUsers(userID, friendsArray, "Hello");
+System.out.println("The messages were sent: " + sent);
+```
+
+In JavaScript:
+```javascript
+getActiveUser(function(userID)
+{
+	getFriendsOfUser(userID, function(friendsArray){
+		sendMessageToUsers(userID, friendsArray, "Hello", function(sent)
+		{
+			console.log("The messages were sent: " + sent);
+		});
+	});
+});
+```
+
+<h3>Async Functions in For Loops</h3>
+Let's say we need to make multiple calls to a web service, and then do something afterwards. Assume for this example that we have two user IDs and a function <b>sendMessage</b> that sends a message to a single user.
+
+To send a message to those users, we could write our JavaScript like this:
+```javascript
+sendMessage(userID_A, "Hello", function()
+{
+	sendMessage(userID_B, "Hello", function()
+	{
+		console.log("sent messages");
+	});
+});
+```
+
+This is a very clean way to structure our code. It will send "Hello" to userA first, then send a message "Hello" to userB and finally show "sent messages."
+
+But what if you had to send messages to 5 users? or 10? or 100? Should we still use nested callbacks like this? No - that would be impossible to read.
+
+I see a lot of developers try to write something like this:
+```javascript
+var userIDs = [....]; //an array of X length
+
+for(var i=0; i<userIDs.length; i++)
+{
+	var userID = userIDs[i];
+	sendMessage(userID_B, "Hello", function()
+	{
+		console.log("sent one message");
+	});
+}
+
+console.log("sent messages");
+```
+
+Here's what will happen at runtime:
+<ol>
+<li>X requests will be made to the <b>sendMessage</b> web service</li>
+<li>The console will log "sent messages"</li>
+<li>X responses will return (at some time), followed by the log "sent one message"</li>
+</ol>
+
+Notice what's happening here: the final log is executing after the requests to the web service have been made, NOT after the responses have returned. We want all X responses to return and then to log "sent messages." Here's how:
+
+A simple solution to this is creating one more function and a counter equal to the number of asyncronous calls:
+```javascript
+var messagesToSend = userIDs.length;
+function sentMessage()
+{
+	messagesToSend--;
+	if(messagesToSend == 0)
+	{
+		//all web service responses have been received!
+		console.log("sent messages");
+	}
+}
+```
+
+This function will be called every time <b>sendMessage</b> executes it's callback. It will only execute the final log, after it has been called X times.
+
+Here's the correct way to structure this code:
+```javascript
+var userIDs = [....]; //an array of unknown or large size
+var messagesToSend = userIDs.length;
+
+for(var i=0; i<userIDs.length; i++)
+{
+	var userID = userIDs[i];
+	sendMessage(userID_B, "Hello", sentMessage);
+}
+
+function sentMessage()
+{
+	console.log("sent one message");
+	
+	messagesToSend--;
+	if(messagesToSend == 0)
+	{
+		//all web service responses have been received!
+		console.log("sent messages");
+	}
+}
+```
